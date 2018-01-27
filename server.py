@@ -2,13 +2,13 @@
 
 import sys
 import math
-import base64
+import time
 import tkinter
-import subprocess
+import os
 from io import BytesIO
-from PIL import Image as PILImage
 from websocket_server import WebsocketServer
 import string
+from multiprocessing import Process, Queue
 
 # Called for every client connecting (after handshake)
 def new_client(client, server):
@@ -24,6 +24,8 @@ def client_left(client, server):
 # Called when a client sends a message
 def message_received(client, server, message):
 	print("Client(%d) said: %s" % (client['id'], message))
+	server.send_message(client, "hi")	
+	
 
 PORT=9001
 HOST="172.31.27.32"
@@ -31,4 +33,18 @@ server = WebsocketServer(PORT, HOST)
 server.set_fn_new_client(new_client)
 server.set_fn_client_left(client_left)
 server.set_fn_message_received(message_received)
-server.run_forever()
+
+def runserver():
+	print("howdy")
+	server.run_forever()
+
+def venmo():
+	while True:
+		time.sleep(1)
+		os.system('venmo balance')
+
+first = Process(target=runserver, args=())
+second = Process(target=venmo, args=())
+
+second.start()
+first.start()
